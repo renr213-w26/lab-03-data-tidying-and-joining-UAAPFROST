@@ -105,10 +105,24 @@ Get to know the data.
 
 a.  `glimpse()` at the `country_inflation` data frame and answer the following questions based on the output. How many rows does `country_inflation` have and what does each row represent? How many columns does `country_inflation` have and what does each column represent?
 
+    ```{r}
+    glimpse(country_inflation)
+
+    ```
+
+    It has 44 rows that represent an observation of inflation in a country during a specific year and 30 columns that represent the variables (country, year, inflation)
+
 b.  Display a list of the countries included in the dataset.
 
 ::: callout-tip
 A function that can be useful for part (b) is `pull()`. Check out its documentation for examples of usage.
+
+```{r}
+
+country_inflation |>
+  distinct(country) |>
+  pull(country)
+```
 :::
 
 ### Question 2
