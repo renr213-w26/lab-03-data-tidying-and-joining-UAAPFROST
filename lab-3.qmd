@@ -131,7 +131,22 @@ Which countries had the top three highest inflation rates in 2021? Your output s
 
 ::: callout-tip
 Column names that are numbers are not considered "proper" in R, therefore to select them you'll need to surround them with backticks, e.g. `select(` `` ` `` `1993` `` ` `` `)`.
+
+```{r}
+country_inflation |>
+  select(country, `2021`) |>
+  arrange(desc(`2021`)) |>
+  head(n=3)
+```
 :::
+
+```{r}
+country_inflation |>
+  filter(country == "United States") |>
+  select(country, `2021`)
+```
+
+The countries that had the top 3 inflation rates were Argentina, Turkey, and Brazil. They all had significantly higher inflation rates than the United States, 48% (Argentina), 20% (Turkey), and 8% (Brazil)vs 5% (United States).
 
 ### Question 3
 
