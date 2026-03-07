@@ -195,11 +195,11 @@ inflation_new <- country_inflation |>
     values_to = "annual_inflation",
     names_transform = as.numeric
   )
-view(inflation_new)
+glimpse(inflation_new)
 ```
 :::
 
-The resulting dataset has 1276 rows.
+The resulting dataset has 3 columns and 1276 rows.
 
 ### Question 5
 
@@ -273,7 +273,7 @@ The number of distinct countries in the filtered data frame you created in part 
 ```{r}
 inflation_coi <- inflation_new |>
 filter(country %in% countries_of_interest)
-view(inflation_coi)
+glimpse(inflation_coi)
 ```
 
 ```{r}
@@ -294,7 +294,8 @@ Requirements for the plot:
 -   Plot should be customized in at least one way – you could use a different than default color scale, or different than default theme, or some other customization.
 
 ```{r}
-ggplot(inflation_coi, aes(x = year, y = annual_inflation, color = country, shape = country, alpha = 0.05)) +
+ggplot(inflation_coi, aes(x = year, y = annual_inflation, 
+                          color = country, shape = country, alpha = 0.05)) +
 geom_line(size = 1) +
 geom_point(size = 2) +
 scale_color_manual(
@@ -316,6 +317,8 @@ labs(
 theme_minimal()
 
 ```
+
+China seemed to have much higher levels of inflation during the earlier years, roughly from 1993-1997, in comparison to both the United States and Canada which is quite surprising. All 3 countries were negatively effected by the 2008 market crash but rebounded in the few years after. Lastly, the United States as well as Canada seem to have higher rates of inflation during recent years in comparison to China.
 
 ::: render-commit-push
 If you haven't yet done so, now is a good time to render, commit, and push. Make sure that you commit and push all changed documents and your Git pane is completely empty before proceeding.
@@ -354,7 +357,19 @@ cpi_divisions <- read_csv("data/cpi-divisions.csv")
 
 a\. How many columns and how many rows does the `us_inflation` dataset have? What are the variables in it? Add a brief (1-2 sentences) narrative summarizing this information.
 
+```{r}
+glimpse(us_inflation)
+```
+
+The dataset has 132 rows and 4 columns. The 4 different variables include country which only includes the United States, cpi_division_id which includes the 12 different divisions, year which tells the year, and lastly the annual inflation.
+
 b\. How many columns and how many rows does the `cpi_divisions` dataset have? What are the variables in it? Add a brief (1-2 sentences) narrative summarizing this information.
+
+```{r}
+glimpse(cpi_divisions)
+```
+
+The cpi_divisions dataset has 12 rows and 2 columns. The variables include id number and descriptions associated with each number.
 
 c\. Create a new dataset by joining the `us_inflation` dataset with the `cpi_division_id` dataset.
 
@@ -366,6 +381,14 @@ c\. Create a new dataset by joining the `us_inflation` dataset with the `cpi_div
 
 Then, find the number of rows and columns of the resulting dataset and report the names of its columns. Add a brief (1-2 sentences) narrative summarizing this information.
 
+```{r}
+us_inflation_new <- us_inflation |>
+  left_join(cpi_divisions, by = c("cpi_division_id" = "id"))
+glimpse(us_inflation_new)
+```
+
+The dataset has 132 rows and 5 columns. The column names include country, cpi_division_id, year, annual_inflation, and lastly description.
+
 ### Question 9
 
 a\. Create a vector called `divisions_of_interest` which contains the descriptions or IDs of CPI divisions you want to visualize. Your `divisions_of_interest` should consist of no more than five divisions. If you're using descriptions, make sure that the spelling of your divisions matches how they appear in the dataset. Then, in 1-2 sentences, state why you chose these divisions.
@@ -374,7 +397,28 @@ a\. Create a vector called `divisions_of_interest` which contains the descriptio
 Refer back to the guidance provided in [Question 6] if you're not sure how to create this vector.
 :::
 
+```{r}
+divisions_of_interest <- c(
+  "Health",
+  "Transport",
+  "Education",
+  "Housing, water, electricity, gas and other fuels"
+)
+```
+
+I chose these IDs specifically as they are necessities for most if not all people.
+
 b\. In a single pipeline, filter your reshaped dataset to include only the `divisions_of_interest` from part (a), and save the resulting data frame with a new name so you (1) can refer to this data frame later in your analysis and (2) do not overwrite the data frame you're starting with. Use a short but informative name. Then, in a new pipeline, find the `distinct()` divisions in the data frame you created.
+
+```{r}
+us_inflation_divisions <- us_inflation_new |>
+  filter(description %in% divisions_of_interest)
+```
+
+```{r}
+us_inflation_divisions |>
+  distinct(description)
+```
 
 ### Question 10
 
@@ -388,12 +432,38 @@ Using your data frame from the previous question, create a plot of annual inflat
 -   If your legend has labels that are too long, you can try moving the legend to the bottom and stack the labels vertically. *Hint:* The `legend.position` and `legend.direction` arguments of the `theme()` functions will be useful.
 
 ```{r}
-ggplot() +
+us_inflation_divisions |>
+ggplot(aes(x = year, y = annual_inflation, colour = description, 
+           shape = description, alpha = 0.05)
+) +
+  geom_line() +
+  geom_point(size = 2) +
+  scale_colour_manual(
+    values = c(
+      "Housing, water, electricity, gas and other fuels" = "black",	
+      "Health" = "red",
+      "Transport" = "blue",	
+      "Education" = "yellow"
+    )
+  ) +
+  labs(
+    title = "U.S Annual Inflation vs CPI Division",
+    subtitle = "2011-2021",
+    x = "Year",
+    y = "Annual Inflation (%)",
+    colour = "Divisions",
+    shape = "Divisions",
+    alpha = "Alpha"
+    
+  ) +
+  theme_minimal() +
   theme(
     legend.position = "bottom", 
     legend.direction = "vertical"
   )
 ```
+
+Transport has seemed to experience the most variation in its rate of inflation over the years when compared to the other 3 divisions displayed within the plot. I would argue with my very little economice knowledge that transportation is less significant to people in comparison to the other 3 divisions, thus it's variation in demand leads to greater variation of inflation. Its quite surprising how the other 3 divisions stayed so relatively similar in terms of inflation over the years.
 
 ::: render-commit-push
 If you haven't yet done so since Part 1, now is a good time to render, commit, and push. Make sure that you commit and push all changed documents and your Git pane is completely empty before proceeding.
